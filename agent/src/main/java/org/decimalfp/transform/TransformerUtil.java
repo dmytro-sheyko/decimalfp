@@ -10,6 +10,9 @@ import org.objectweb.asm.Opcodes;
  * @author Dmytro.Sheyko
  */
 public class TransformerUtil {
+    public static final String CLASS_FPUTIL = "org/decimalfp/core/FPUtil";
+    public static final String CLASS_ANN_FP = "org/decimalfp/core/DecimalFP";
+
     public static byte[] transform(byte[] classbytes) {
         ClassReader classReader = new ClassReader(classbytes);
         ClassWriter classWriter = new ClassWriter(0);
@@ -31,7 +34,6 @@ public class TransformerUtil {
     }
 
     static class TransformerMethodVisitor extends MethodVisitor {
-        private static final String CLASS_UTIL = "org/decimalfp/core/FPUtil";
         private static final String DESC_DD_D = "(DD)D";
         private static final String DESC_FF_F = "(FF)F";
 
@@ -46,34 +48,34 @@ public class TransformerUtil {
                 super.visitInsn(opcode);
                 break;
             case Opcodes.DADD:
-                super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_UTIL, "dec_dadd", DESC_DD_D, false);
+                super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_dadd", DESC_DD_D, false);
                 break;
             case Opcodes.DSUB:
-                super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_UTIL, "dec_dsub", DESC_DD_D, false);
+                super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_dsub", DESC_DD_D, false);
                 break;
             case Opcodes.DMUL:
-                super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_UTIL, "dec_dmul", DESC_DD_D, false);
+                super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_dmul", DESC_DD_D, false);
                 break;
             case Opcodes.DDIV:
-                super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_UTIL, "dec_ddiv", DESC_DD_D, false);
+                super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_ddiv", DESC_DD_D, false);
                 break;
             case Opcodes.DREM:
-                super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_UTIL, "dec_drem", DESC_DD_D, false);
+                super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_drem", DESC_DD_D, false);
                 break;
             case Opcodes.FADD:
-                super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_UTIL, "dec_fadd", DESC_FF_F, false);
+                super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_fadd", DESC_FF_F, false);
                 break;
             case Opcodes.FSUB:
-                super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_UTIL, "dec_fsub", DESC_FF_F, false);
+                super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_fsub", DESC_FF_F, false);
                 break;
             case Opcodes.FMUL:
-                super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_UTIL, "dec_fmul", DESC_FF_F, false);
+                super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_fmul", DESC_FF_F, false);
                 break;
             case Opcodes.FDIV:
-                super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_UTIL, "dec_fdiv", DESC_FF_F, false);
+                super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_fdiv", DESC_FF_F, false);
                 break;
             case Opcodes.FREM:
-                super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_UTIL, "dec_frem", DESC_FF_F, false);
+                super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_frem", DESC_FF_F, false);
                 break;
             }
         }
