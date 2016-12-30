@@ -15,5 +15,10 @@
       <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.decimalfp</groupId>
+      <artifactId>decimalfp-core</artifactId>
+      <version>0-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 </project>
