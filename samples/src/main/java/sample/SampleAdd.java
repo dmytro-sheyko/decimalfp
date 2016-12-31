@@ -2,7 +2,7 @@ package sample;
 
 import org.decimalfp.annotation.DecimalFP;
 
-public class Sample {
+public class SampleAdd {
     public static void main(String[] args) {
         bin_test0d();
         dec_test0d();

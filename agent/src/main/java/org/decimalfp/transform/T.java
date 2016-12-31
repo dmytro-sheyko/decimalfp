@@ -11,7 +11,7 @@ import java.util.Arrays;
 
 public class T {
     public static void main(String[] args) throws IOException {
-        File infile = new File("../samples/target/classes/sample/Sample.class");
+        File infile = new File("../samples/target/classes/sample/SampleAdd.class");
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try (InputStream is = new BufferedInputStream(new FileInputStream(infile))) {
             int r;
@@ -22,10 +22,11 @@ public class T {
         byte[] initial = bos.toByteArray();
         System.out.println(initial.length);
         byte[] transformed = TransformerUtil.transform(initial);
+        if (transformed == null) transformed = initial;
         System.out.println(transformed.length);
         System.out.println(initial != transformed);
         System.out.println(Arrays.equals(initial, transformed));
-        File outfile = new File("../samples/gen/sample/Sample.class");
+        File outfile = new File("../samples/gen/sample/SampleAdd.class");
         outfile.getParentFile().mkdirs();
         try (FileOutputStream fos = new FileOutputStream(outfile)) {
             fos.write(transformed);

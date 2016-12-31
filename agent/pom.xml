@@ -8,6 +8,24 @@
   <artifactId>decimalfp-agent</artifactId>
   <packaging>jar</packaging>
   <name>agent</name>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.0.2</version>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Premain-Class>org.decimalfp.agent.AgentMain</Premain-Class>
+              <Agent-Class>org.decimalfp.agent.AgentMain</Agent-Class>
+              <Can-Retransform-Classes>true</Can-Retransform-Classes>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
