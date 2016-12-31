@@ -64,6 +64,8 @@ public class TransformerUtil {
     static class TransformerMethodVisitor extends MethodVisitor {
         private static final String DESC_DD_D = "(DD)D";
         private static final String DESC_FF_F = "(FF)F";
+        private static final String DESC_F_D = "(F)D";
+        private static final String DESC_D_F = "(D)F";
         private final BooleanConsumer setChanged_;
         private boolean enabled_;
         private boolean changed_;
@@ -134,6 +136,14 @@ public class TransformerUtil {
                 case Opcodes.FREM:
                     changed_ = true;
                     super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_frem", DESC_FF_F, false);
+                    break;
+                case Opcodes.F2D:
+                    changed_ = true;
+                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_f2d", DESC_F_D, false);
+                    break;
+                case Opcodes.D2F:
+                    changed_ = true;
+                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_d2f", DESC_D_F, false);
                     break;
                 }
             } else {
