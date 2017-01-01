@@ -11,17 +11,17 @@ import org.objectweb.asm.Opcodes;
  * @author Dmytro.Sheyko
  */
 public class TransformerUtil {
-    public static final String CLASS_FPUTIL_DOT = "org.decimalfp.core.FPUtil";
-    private static final String CLASS_FPUTIL = "org/decimalfp/core/FPUtil";
-    private static final String CLASS_ANN_FP = "org/decimalfp/annotation/DecimalFP";
-    private static final String CLASSL_ANN_FP = "L" + CLASS_ANN_FP + ";";
+    public static final String CLASS_DOT_FPUTIL = "org.decimalfp.core.FPUtil";
+    private static final String CLASS_SLASH_FPUTIL = "org/decimalfp/core/FPUtil";
+    private static final String CLASS_SLASH_ANN_FP = "org/decimalfp/annotation/DecimalFP";
+    private static final String CLASS_L_ANN_FP = "L" + CLASS_SLASH_ANN_FP + ";";
 
     public static byte[] transform(byte[] classbytes) {
-        ClassReader classReader = new ClassReader(classbytes);
-        ClassWriter classWriter = new ClassWriter(0);
-        TransformerClassVisitor transformer = new TransformerClassVisitor(Opcodes.ASM5, classWriter);
-        classReader.accept(transformer, 0);
-        return transformer.isModified() ? classWriter.toByteArray() : null;
+        ClassReader classreader = new ClassReader(classbytes);
+        ClassWriter classwriter = new ClassWriter(classreader, 0);
+        TransformerClassVisitor transformer = new TransformerClassVisitor(Opcodes.ASM5, classwriter);
+        classreader.accept(transformer, 0);
+        return transformer.isModified() ? classwriter.toByteArray() : null;
     }
 
     static class TransformerClassVisitor extends ClassVisitor {
@@ -37,7 +37,7 @@ public class TransformerUtil {
         @Override
         public AnnotationVisitor visitAnnotation(String name, boolean visible) {
             AnnotationVisitor visitor = super.visitAnnotation(name, visible);
-            if (CLASSL_ANN_FP.equals(name)) {
+            if (CLASS_L_ANN_FP.equals(name)) {
                 visitor = new TransformerAnnotationVisitor(api, visitor, this::setEnabled);
             }
             return visitor;
@@ -80,7 +80,7 @@ public class TransformerUtil {
         @Override
         public AnnotationVisitor visitAnnotation(String name, boolean visible) {
             AnnotationVisitor visitor = super.visitAnnotation(name, visible);
-            if (CLASSL_ANN_FP.equals(name)) {
+            if (CLASS_L_ANN_FP.equals(name)) {
                 visitor = new TransformerAnnotationVisitor(api, visitor, this::setEnabled);
             }
             return visitor;
@@ -94,61 +94,57 @@ public class TransformerUtil {
         public void visitInsn(int opcode) {
             if (enabled_) {
                 switch (opcode) {
-                default:
-                    super.visitInsn(opcode);
-                    break;
                 case Opcodes.DADD:
                     changed_ = true;
-                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_dadd", DESC_DD_D, false);
-                    break;
+                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_SLASH_FPUTIL, "dec_dadd", DESC_DD_D, false);
+                    return;
                 case Opcodes.DSUB:
                     changed_ = true;
-                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_dsub", DESC_DD_D, false);
-                    break;
+                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_SLASH_FPUTIL, "dec_dsub", DESC_DD_D, false);
+                    return;
                 case Opcodes.DMUL:
                     changed_ = true;
-                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_dmul", DESC_DD_D, false);
-                    break;
+                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_SLASH_FPUTIL, "dec_dmul", DESC_DD_D, false);
+                    return;
                 case Opcodes.DDIV:
                     changed_ = true;
-                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_ddiv", DESC_DD_D, false);
-                    break;
+                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_SLASH_FPUTIL, "dec_ddiv", DESC_DD_D, false);
+                    return;
                 case Opcodes.DREM:
                     changed_ = true;
-                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_drem", DESC_DD_D, false);
-                    break;
+                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_SLASH_FPUTIL, "dec_drem", DESC_DD_D, false);
+                    return;
                 case Opcodes.FADD:
                     changed_ = true;
-                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_fadd", DESC_FF_F, false);
-                    break;
+                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_SLASH_FPUTIL, "dec_fadd", DESC_FF_F, false);
+                    return;
                 case Opcodes.FSUB:
                     changed_ = true;
-                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_fsub", DESC_FF_F, false);
-                    break;
+                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_SLASH_FPUTIL, "dec_fsub", DESC_FF_F, false);
+                    return;
                 case Opcodes.FMUL:
                     changed_ = true;
-                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_fmul", DESC_FF_F, false);
-                    break;
+                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_SLASH_FPUTIL, "dec_fmul", DESC_FF_F, false);
+                    return;
                 case Opcodes.FDIV:
                     changed_ = true;
-                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_fdiv", DESC_FF_F, false);
-                    break;
+                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_SLASH_FPUTIL, "dec_fdiv", DESC_FF_F, false);
+                    return;
                 case Opcodes.FREM:
                     changed_ = true;
-                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_frem", DESC_FF_F, false);
-                    break;
+                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_SLASH_FPUTIL, "dec_frem", DESC_FF_F, false);
+                    return;
                 case Opcodes.F2D:
                     changed_ = true;
-                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_f2d", DESC_F_D, false);
-                    break;
+                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_SLASH_FPUTIL, "dec_f2d", DESC_F_D, false);
+                    return;
                 case Opcodes.D2F:
                     changed_ = true;
-                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_FPUTIL, "dec_d2f", DESC_D_F, false);
-                    break;
+                    super.visitMethodInsn(Opcodes.INVOKESTATIC, CLASS_SLASH_FPUTIL, "dec_d2f", DESC_D_F, false);
+                    return;
                 }
-            } else {
-                super.visitInsn(opcode);
             }
+            super.visitInsn(opcode);
         }
 
         @Override
