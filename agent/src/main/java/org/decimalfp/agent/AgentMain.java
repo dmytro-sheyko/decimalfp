@@ -10,8 +10,8 @@ import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.decimalfp.search.HorspoolSearch;
 import org.decimalfp.search.ISubarraySearch;
-import org.decimalfp.search.NaiveSearch;
 import org.decimalfp.transform.TransformerUtil;
 
 /**
@@ -49,7 +49,7 @@ public class AgentMain {
         sought[1] = (byte) ((utf8length >>> 8) & 0xff);
         sought[2] = (byte) ((utf8length >>> 0) & 0xff);
         System.arraycopy(utf8, 0, sought, 3, utf8length);
-        return NaiveSearch.Factory.prepare(sought);
+        return HorspoolSearch.Factory.prepare(sought);
     }
 
     static void main(Instrumentation inst) {
