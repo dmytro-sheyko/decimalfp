@@ -69,7 +69,7 @@ public class AgentMain {
         try {
             loader.loadClass(TransformerUtil.CLASS_DOT_FPUTIL);
             return true;
-        } catch (Throwable e) {
+        } catch (ClassNotFoundException e) {
             return false;
         }
     }
