@@ -3,12 +3,15 @@ package org.decimalfp.agent;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
+import java.nio.charset.StandardCharsets;
 import java.security.ProtectionDomain;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.decimalfp.search.ISubarraySearch;
+import org.decimalfp.search.NaiveSearch;
 import org.decimalfp.transform.TransformerUtil;
 
 /**
@@ -17,6 +20,7 @@ import org.decimalfp.transform.TransformerUtil;
 public class AgentMain {
     static final AtomicLong TransformTime_ = new AtomicLong();
     static final AtomicInteger TransformCount_ = new AtomicInteger();
+    static final ISubarraySearch AnnotationSearch_ = prepareAnnotationSearch(TransformerUtil.CLASS_DESC_DECIMALFP);
 
     public static void premain(String args, Instrumentation inst) {
         main(inst);
@@ -34,6 +38,18 @@ public class AgentMain {
 
     static void printStatistics() {
         System.out.println("Transform:\t" + TransformCount_.get() + "\t" + TransformTime_.get());
+    }
+
+    static ISubarraySearch prepareAnnotationSearch(String annotationClassDesc) {
+        byte[] utf8 = annotationClassDesc.getBytes(StandardCharsets.UTF_8);
+        int utf8length = utf8.length;
+        assert utf8length >= 0 && utf8length <= 0xffff : utf8length;
+        byte[] sought = new byte[utf8length + 3];
+        sought[0] = 1; // tag CONSTANT_Utf8
+        sought[1] = (byte) ((utf8length >>> 8) & 0xff);
+        sought[2] = (byte) ((utf8length >>> 0) & 0xff);
+        System.arraycopy(utf8, 0, sought, 3, utf8length);
+        return NaiveSearch.Factory.prepare(sought);
     }
 
     static void main(Instrumentation inst) {
@@ -94,7 +110,9 @@ public class AgentMain {
         public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
             long start = System.nanoTime();
             try {
-                if (TransformerUtil.CLASS_DOT_FPUTIL.equals(className))
+                if (TransformerUtil.CLASS_SLASH_FPUTIL.equals(className))
+                    return null;
+                if (AnnotationSearch_.firstIndexIn(classfileBuffer) < 0)
                     return null;
                 return isTransformable(map_, loader) ?
                         TransformerUtil.transform(classfileBuffer) :

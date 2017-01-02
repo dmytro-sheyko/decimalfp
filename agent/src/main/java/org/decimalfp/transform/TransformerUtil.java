@@ -12,9 +12,8 @@ import org.objectweb.asm.Opcodes;
  */
 public class TransformerUtil {
     public static final String CLASS_DOT_FPUTIL = "org.decimalfp.core.FPUtil";
-    private static final String CLASS_SLASH_FPUTIL = "org/decimalfp/core/FPUtil";
-    private static final String CLASS_SLASH_ANN_FP = "org/decimalfp/annotation/DecimalFP";
-    private static final String CLASS_L_ANN_FP = "L" + CLASS_SLASH_ANN_FP + ";";
+    public static final String CLASS_SLASH_FPUTIL = "org/decimalfp/core/FPUtil";
+    public static final String CLASS_DESC_DECIMALFP = "Lorg/decimalfp/annotation/DecimalFP;";
 
     public static byte[] transform(byte[] classbytes) {
         ClassReader classreader = new ClassReader(classbytes);
@@ -37,7 +36,7 @@ public class TransformerUtil {
         @Override
         public AnnotationVisitor visitAnnotation(String name, boolean visible) {
             AnnotationVisitor visitor = super.visitAnnotation(name, visible);
-            if (CLASS_L_ANN_FP.equals(name)) {
+            if (CLASS_DESC_DECIMALFP.equals(name)) {
                 visitor = new TransformerAnnotationVisitor(api, visitor, this::setEnabled);
             }
             return visitor;
@@ -80,7 +79,7 @@ public class TransformerUtil {
         @Override
         public AnnotationVisitor visitAnnotation(String name, boolean visible) {
             AnnotationVisitor visitor = super.visitAnnotation(name, visible);
-            if (CLASS_L_ANN_FP.equals(name)) {
+            if (CLASS_DESC_DECIMALFP.equals(name)) {
                 visitor = new TransformerAnnotationVisitor(api, visitor, this::setEnabled);
             }
             return visitor;
