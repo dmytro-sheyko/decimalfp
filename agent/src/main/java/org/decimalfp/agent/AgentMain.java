@@ -6,6 +6,8 @@ import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.decimalfp.transform.TransformerUtil;
 
@@ -13,6 +15,9 @@ import org.decimalfp.transform.TransformerUtil;
  * @author Dmytro.Sheyko
  */
 public class AgentMain {
+    static final AtomicLong TransformTime_ = new AtomicLong();
+    static final AtomicInteger TransformCount_ = new AtomicInteger();
+
     public static void premain(String args, Instrumentation inst) {
         main(inst);
     }
@@ -21,8 +26,19 @@ public class AgentMain {
         main(inst);
     }
 
+    static void onTransformFinished(long start, long end) {
+        long time = end - start;
+        TransformCount_.incrementAndGet();
+        TransformTime_.addAndGet(time);
+    }
+
+    static void printStatistics() {
+        System.out.println("Transform:\t" + TransformCount_.get() + "\t" + TransformTime_.get());
+    }
+
     static void main(Instrumentation inst) {
-        Map<ClassLoader, MutableMaybe> map = new WeakHashMap<>();
+        Runtime.getRuntime().addShutdownHook(new Thread(AgentMain::printStatistics, "decimalfp-printStatistics"));
+        Map<ClassLoader, BoolResult> map = new WeakHashMap<>();
         isTransformable(map, null);
         for (ClassLoader loader = ClassLoader.getSystemClassLoader(); loader != null; loader = loader.getParent()) {
             isTransformable(map, loader);
@@ -42,12 +58,12 @@ public class AgentMain {
         }
     }
 
-    static boolean isTransformable(Map<ClassLoader, MutableMaybe> map, ClassLoader loader) {
-        MutableMaybe result;
+    static boolean isTransformable(Map<ClassLoader, BoolResult> map, ClassLoader loader) {
+        BoolResult result;
         synchronized (map) {
             result = map.get(loader);
             if (result == null) {
-                result = new MutableMaybe();
+                result = new BoolResult();
                 map.put(loader, result);
             }
         }
@@ -62,25 +78,30 @@ public class AgentMain {
         return value;
     }
 
-    static class MutableMaybe {
+    static class BoolResult {
         boolean ready_ = false;
         boolean value_;
     }
 
     static class Transformer implements ClassFileTransformer {
-        private final Map<ClassLoader, MutableMaybe> map_;
+        private final Map<ClassLoader, BoolResult> map_;
 
-        public Transformer(Map<ClassLoader, MutableMaybe> map) {
+        public Transformer(Map<ClassLoader, BoolResult> map) {
             map_ = map;
         }
 
         @Override
         public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
-            if (TransformerUtil.CLASS_DOT_FPUTIL.equals(className))
-                return null;
-            return isTransformable(map_, loader) ? 
-                TransformerUtil.transform(classfileBuffer) :
-                null;
+            long start = System.nanoTime();
+            try {
+                if (TransformerUtil.CLASS_DOT_FPUTIL.equals(className))
+                    return null;
+                return isTransformable(map_, loader) ?
+                        TransformerUtil.transform(classfileBuffer) :
+                        null;
+            } finally {
+                onTransformFinished(start, System.nanoTime());
+            }
         }
     }
 }
