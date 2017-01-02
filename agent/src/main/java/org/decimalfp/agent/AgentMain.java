@@ -4,8 +4,8 @@ import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
-import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import org.decimalfp.transform.TransformerUtil;
 
@@ -22,7 +22,7 @@ public class AgentMain {
     }
 
     static void main(Instrumentation inst) {
-        Map<ClassLoader, MutableMaybe> map = new IdentityHashMap<>();
+        Map<ClassLoader, MutableMaybe> map = new WeakHashMap<>();
         isTransformable(map, null);
         for (ClassLoader loader = ClassLoader.getSystemClassLoader(); loader != null; loader = loader.getParent()) {
             isTransformable(map, loader);
